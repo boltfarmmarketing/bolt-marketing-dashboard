@@ -1,0 +1,55 @@
+name: Weekly Refresh
+
+# Three triggers:
+#   - Push to data/olive/**       → fires whenever the operator updates Olive numbers
+#   - Monday 11:00 UTC (6am CDT)  → weekly backup refresh so Windsor/HubSpot stay current
+#                                   even without an Olive update. Drifts to 5am during
+#                                   CST; adjust to '0 12 * * 1' if you prefer locking
+#                                   to winter time.
+#   - workflow_dispatch            → manual "run now" button
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'data/olive/**'
+  schedule:
+    - cron: '0 11 * * 1'
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build data.json
+        run: npm run build
+        env:
+          WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
+          WINDSOR_GOOGLE_ADS_ACCOUNT_ID: ${{ secrets.WINDSOR_GOOGLE_ADS_ACCOUNT_ID }}
+          WINDSOR_META_AD_ACCOUNT_ID: ${{ secrets.WINDSOR_META_AD_ACCOUNT_ID }}
+          WINDSOR_GA4_PROPERTY_ID: ${{ secrets.WINDSOR_GA4_PROPERTY_ID }}
+          HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
+          HUBSPOT_PIPELINE_NAME: ${{ secrets.HUBSPOT_PIPELINE_NAME }}
+          HUBSPOT_EXCLUDED_OWNER_NAMES: ${{ secrets.HUBSPOT_EXCLUDED_OWNER_NAMES }}
+          HUBSPOT_QUALIFIED_STAGE: ${{ secrets.HUBSPOT_QUALIFIED_STAGE }}
+
+      - name: Commit refreshed data.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data.json
+          if git diff --cached --quiet; then
+            echo "No data.json changes."
+          else
+            git commit -m "chore(data): weekly refresh $(date -u +%Y-%m-%d)"
+            git push
+          fi

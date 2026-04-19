@@ -1,0 +1,197 @@
+:root {
+  --dark-green: #335338;
+  --dark-green-deep: #2a3c30;
+  --dark: #000000;
+  --dark-slate-grey: #383a42;
+  --seashell: #fff9f3;
+  --white: #FEFDFB;
+  --sienna: #866042;
+  --burlywood: #ddc087;
+  --powder-blue: #b7ccbc;
+  --radius: 16px;
+
+  --good: #335338;
+  --bad: #a04a3e;
+  --neutral: rgba(56, 58, 66, 0.6);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Ovo', serif;
+  background: var(--seashell);
+  color: var(--dark-slate-grey);
+  line-height: 1.7;
+  font-weight: 400;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Hero ─────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(165deg, var(--dark-green-deep) 0%, var(--dark-green) 45%, #3A5F4F 85%, var(--powder-blue) 140%);
+  color: var(--white);
+  padding: 64px 24px 72px;
+  text-align: center;
+}
+
+.hero-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.hero .eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2.2px;
+  color: var(--powder-blue);
+  margin-bottom: 18px;
+  opacity: 0.95;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.15;
+  font-weight: 400;
+  margin-bottom: 14px;
+  text-wrap: balance;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--burlywood);
+}
+
+.hero-subtitle {
+  font-size: 16px;
+  max-width: 520px;
+  margin: 0 auto;
+  opacity: 0.85;
+  text-wrap: balance;
+}
+
+/* ── Container & grid ─────────────────────────────── */
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* ── KPI card ─────────────────────────────────────── */
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 22px 22px 18px;
+  border: 1px solid rgba(183, 204, 188, 0.28);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  min-height: 232px;
+}
+
+.card .label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: var(--sienna);
+  margin-bottom: 12px;
+}
+
+.card .value {
+  font-size: clamp(1.8rem, 2.4vw, 2.3rem);
+  line-height: 1.1;
+  color: var(--dark-slate-grey);
+  margin-bottom: 10px;
+}
+
+.card .deltas {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.card .delta .arrow { display: inline-block; width: 14px; }
+.card .delta-wow { font-size: 13.5px; }
+.card .delta-yoy {
+  font-size: 12px;
+  color: var(--neutral);
+}
+.card .delta-yoy .arrow { color: inherit; }
+
+.delta.good { color: var(--good); }
+.delta.bad  { color: var(--bad);  }
+.delta.flat { color: var(--neutral); }
+
+.card .sources {
+  border-top: 1px solid rgba(56, 58, 66, 0.10);
+  padding-top: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+.card .source-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--dark-slate-grey);
+}
+
+.card .source-row .src-label {
+  opacity: 0.70;
+}
+
+.card .sparkline-wrap {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.sparkline { display: block; }
+
+/* ── Footer ───────────────────────────────────────── */
+
+.footer {
+  text-align: center;
+  padding: 24px 24px 40px;
+  font-size: 12px;
+  color: var(--dark-slate-grey);
+  opacity: 0.55;
+  max-width: 1240px;
+  margin: 16px auto 0;
+  border-top: 1px solid rgba(56, 58, 66, 0.12);
+  padding-top: 20px;
+}
+
+.footer .footer-sep {
+  margin: 0 10px;
+  opacity: 0.5;
+}
+
+/* ── Mobile adjustments ───────────────────────────── */
+
+@media (max-width: 560px) {
+  .hero { padding: 52px 20px 56px; }
+  .container { padding: 32px 16px 16px; }
+  .card { min-height: 210px; padding: 20px 18px 16px; }
+  .card .value { font-size: 1.9rem; }
+}

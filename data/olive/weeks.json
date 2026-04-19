@@ -1,0 +1,46 @@
+{
+  "weeks": [
+    {
+      "weekOf": "2026-03-02",
+      "notes": "Mon Mar 2 – Sun Mar 8",
+      "bookings": { "googleAds": 0, "metaAds": 1, "organic": 0, "direct": 10 },
+      "avgBookingValue": 2563.94
+    },
+    {
+      "weekOf": "2026-03-09",
+      "notes": "Mon Mar 9 – Sun Mar 15",
+      "bookings": { "googleAds": 3, "metaAds": 0, "organic": 0, "direct": 11 },
+      "avgBookingValue": 3738.94
+    },
+    {
+      "weekOf": "2026-03-16",
+      "notes": "Mon Mar 16 – Sun Mar 22",
+      "bookings": { "googleAds": 0, "metaAds": 0, "organic": 0, "direct": 7 },
+      "avgBookingValue": 2477.62
+    },
+    {
+      "weekOf": "2026-03-23",
+      "notes": "Mon Mar 23 – Sun Mar 29",
+      "bookings": { "googleAds": 4, "metaAds": 0, "organic": 0, "direct": 6 },
+      "avgBookingValue": 2638.31
+    },
+    {
+      "weekOf": "2026-03-30",
+      "notes": "Mon Mar 30 – Sun Apr 5",
+      "bookings": { "googleAds": 4, "metaAds": 0, "organic": 0, "direct": 12 },
+      "avgBookingValue": 2931.13
+    },
+    {
+      "weekOf": "2026-04-06",
+      "notes": "Mon Apr 6 – Sun Apr 12",
+      "bookings": { "googleAds": 2, "metaAds": 0, "organic": 0, "direct": 7 },
+      "avgBookingValue": 2516.60
+    },
+    {
+      "weekOf": "2026-04-13",
+      "notes": "Mon Apr 13 – Sun Apr 19",
+      "bookings": { "googleAds": 2, "metaAds": 0, "organic": 0, "direct": 12 },
+      "avgBookingValue": 3000.96
+    }
+  ]
+}
