@@ -106,7 +106,14 @@ export async function fetchMeta(dateFrom: string, dateTo: string): Promise<MetaR
     dateTo,
     accountId: process.env.WINDSOR_META_AD_ACCOUNT_ID,
   });
-  return coerceNumericStrings(rows, ['spend', 'conversions', 'clicks', 'impressions']);
+  const coerced = coerceNumericStrings(rows, ['spend', 'conversions', 'clicks', 'impressions']);
+
+  // Business rule: exclude any Meta campaign whose name contains this
+  // substring (case-insensitive). Default: "coaching" — those campaigns
+  // belong to Bolt Coaching, not Bolt Farm Treehouse rentals.
+  const excludePattern = (process.env.META_EXCLUDE_CAMPAIGN_PATTERN ?? 'coaching').toLowerCase();
+  if (!excludePattern) return coerced;
+  return coerced.filter((r) => !String(r.campaign ?? '').toLowerCase().includes(excludePattern));
 }
 
 // ── GA4 ─────────────────────────────────────────────────────────────────
