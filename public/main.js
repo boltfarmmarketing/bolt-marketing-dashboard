@@ -132,28 +132,86 @@ function formatTimestamp(iso) {
   return d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-async function render() {
-  let data;
-  try {
-    const res = await fetch('data.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    data = await res.json();
-  } catch (err) {
-    document.getElementById('hero-subtitle').textContent = 'Could not load data.json';
-    console.error(err);
-    return;
-  }
+function getHashWeek() {
+  const m = /week=(\d{4}-\d{2}-\d{2})/.exec(window.location.hash);
+  return m ? m[1] : null;
+}
 
+function setHashWeek(weekOf) {
+  history.replaceState(null, '', '#week=' + weekOf);
+}
+
+async function fetchJSON(url) {
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(url + ' → HTTP ' + res.status);
+  return res.json();
+}
+
+function renderGrid(data) {
   document.getElementById('hero-subtitle').textContent =
     'Week of ' + formatWeekRange(data.weekOf.start, data.weekOf.end);
-
   document.getElementById('footer-updated').textContent =
     'Last updated ' + formatTimestamp(data.generatedAt);
-
   const grid = document.getElementById('grid');
   grid.innerHTML = METRIC_CONFIG
     .map((cfg) => renderCard(cfg, data.metrics[cfg.key]))
     .join('');
 }
 
-render();
+function renderWeekPicker(weeks, activeWeek, onChange) {
+  const picker = document.getElementById('week-picker');
+  // Newest first in the dropdown.
+  const options = weeks
+    .slice()
+    .reverse()
+    .map((w) => {
+      const label = 'Week of ' + formatWeekRange(w.start, w.end);
+      const selected = w.weekOf === activeWeek ? ' selected' : '';
+      return '<option value="' + w.weekOf + '"' + selected + '>' + label + '</option>';
+    })
+    .join('');
+  picker.innerHTML =
+    '<label class="pick-label">Viewing</label>' +
+    '<select class="pick-select" aria-label="Select week">' + options + '</select>';
+  picker.hidden = false;
+  picker.querySelector('select').addEventListener('change', (e) => {
+    onChange(e.target.value);
+  });
+}
+
+async function loadWeek(weekOf) {
+  try {
+    const data = await fetchJSON('weeks/' + weekOf + '.json');
+    renderGrid(data);
+    setHashWeek(weekOf);
+  } catch (err) {
+    document.getElementById('hero-subtitle').textContent = 'Could not load week ' + weekOf;
+    console.error(err);
+  }
+}
+
+async function init() {
+  // Try the multi-week index first; fall back to single data.json for older deploys.
+  let index;
+  try {
+    index = await fetchJSON('weeks/index.json');
+  } catch {
+    try {
+      const data = await fetchJSON('data.json');
+      renderGrid(data);
+    } catch (err) {
+      document.getElementById('hero-subtitle').textContent = 'Could not load data.';
+      console.error(err);
+    }
+    return;
+  }
+
+  const requested = getHashWeek();
+  const available = index.weeks.map((w) => w.weekOf);
+  const activeWeek = requested && available.includes(requested) ? requested : index.latest;
+
+  renderWeekPicker(index.weeks, activeWeek, (weekOf) => loadWeek(weekOf));
+  await loadWeek(activeWeek);
+}
+
+init();

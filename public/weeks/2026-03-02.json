@@ -1,0 +1,231 @@
+{
+  "generatedAt": "2026-04-20T14:03:06.437Z",
+  "weekOf": {
+    "start": "2026-03-02",
+    "end": "2026-03-08"
+  },
+  "metrics": {
+    "qualifiedLeads": {
+      "current": 1,
+      "prior": 0,
+      "priorYear": 0,
+      "history": [
+        {
+          "week": "2026-01-12",
+          "value": 152
+        },
+        {
+          "week": "2026-01-19",
+          "value": 114
+        },
+        {
+          "week": "2026-01-26",
+          "value": 139
+        },
+        {
+          "week": "2026-02-02",
+          "value": 109
+        },
+        {
+          "week": "2026-02-09",
+          "value": 109
+        },
+        {
+          "week": "2026-02-16",
+          "value": 89
+        },
+        {
+          "week": "2026-02-23",
+          "value": 0
+        },
+        {
+          "week": "2026-03-02",
+          "value": 1
+        }
+      ]
+    },
+    "totalVisitors": {
+      "current": 21835,
+      "prior": 38636,
+      "priorYear": 39513,
+      "history": [
+        {
+          "week": "2026-01-12",
+          "value": 76236
+        },
+        {
+          "week": "2026-01-19",
+          "value": 62860
+        },
+        {
+          "week": "2026-01-26",
+          "value": 46110
+        },
+        {
+          "week": "2026-02-02",
+          "value": 42843
+        },
+        {
+          "week": "2026-02-09",
+          "value": 36444
+        },
+        {
+          "week": "2026-02-16",
+          "value": 32793
+        },
+        {
+          "week": "2026-02-23",
+          "value": 38636
+        },
+        {
+          "week": "2026-03-02",
+          "value": 21835
+        }
+      ]
+    },
+    "conversionRate": {
+      "current": 0.0005037783375314861,
+      "prior": 0,
+      "priorYear": 0,
+      "history": [
+        {
+          "week": "2026-03-02",
+          "value": 0.0005037783375314861
+        }
+      ],
+      "bySource": {
+        "googleAds": 0,
+        "metaAds": 0.00015730690577316344,
+        "organic": 0,
+        "direct": 0.0017803097739006587
+      },
+      "bySourceSecondary": {
+        "googleAds": 0,
+        "metaAds": 1,
+        "organic": 0,
+        "direct": 10
+      }
+    },
+    "googleAdsSpend": {
+      "current": 5386.679499999999,
+      "prior": 4603.809,
+      "priorYear": 1783.0650000000003,
+      "history": [
+        {
+          "week": "2026-01-12",
+          "value": 4334.7732000000005
+        },
+        {
+          "week": "2026-01-19",
+          "value": 4210.938
+        },
+        {
+          "week": "2026-01-26",
+          "value": 4712.462
+        },
+        {
+          "week": "2026-02-02",
+          "value": 5587.344
+        },
+        {
+          "week": "2026-02-09",
+          "value": 5120.3409
+        },
+        {
+          "week": "2026-02-16",
+          "value": 4880.4271
+        },
+        {
+          "week": "2026-02-23",
+          "value": 4603.809
+        },
+        {
+          "week": "2026-03-02",
+          "value": 5386.679499999999
+        }
+      ]
+    },
+    "metaAdsSpend": {
+      "current": 3066.3400000000006,
+      "prior": 3361.41,
+      "priorYear": 4110.22,
+      "history": [
+        {
+          "week": "2026-01-12",
+          "value": 4712.68
+        },
+        {
+          "week": "2026-01-19",
+          "value": 4738.96
+        },
+        {
+          "week": "2026-01-26",
+          "value": 3062.62
+        },
+        {
+          "week": "2026-02-02",
+          "value": 3412.69
+        },
+        {
+          "week": "2026-02-09",
+          "value": 3507.8
+        },
+        {
+          "week": "2026-02-16",
+          "value": 3495.4399999999996
+        },
+        {
+          "week": "2026-02-23",
+          "value": 3361.41
+        },
+        {
+          "week": "2026-03-02",
+          "value": 3066.3400000000006
+        }
+      ]
+    },
+    "costPerBooking": {
+      "current": 768.4563181818182,
+      "prior": 0,
+      "priorYear": 0,
+      "history": [
+        {
+          "week": "2026-03-02",
+          "value": 768.4563181818182
+        }
+      ],
+      "bySource": {
+        "googleAds": 0,
+        "metaAds": 3066.3400000000006
+      }
+    },
+    "totalBookingValue": {
+      "current": 28203.34,
+      "prior": 0,
+      "priorYear": 0,
+      "history": [
+        {
+          "week": "2026-03-02",
+          "value": 28203.34
+        }
+      ],
+      "bySource": {
+        "googleAds": 0,
+        "metaAds": 2564,
+        "organic": 0,
+        "direct": 25639
+      }
+    },
+    "roas": {
+      "current": 3.336481123697869,
+      "prior": 0,
+      "priorYear": 0,
+      "history": [
+        {
+          "week": "2026-03-02",
+          "value": 3.336481123697869
+        }
+      ]
+    }
+  }
+}
