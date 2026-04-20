@@ -12,6 +12,9 @@ export type MetricBasic = {
 
 export type MetricWithSources = MetricBasic & {
   bySource: Record<string, number>;
+  // Optional — when present, rendered alongside the primary bySource value.
+  // Used on the Conversion Rate card to show booking counts next to rates.
+  bySourceSecondary?: Record<string, number>;
 };
 
 export type DashboardData = {

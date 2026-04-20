@@ -144,8 +144,11 @@ function metricBasic(
 function metricWithSources(
   base: MetricBasic,
   bySource: Record<string, number>,
+  bySourceSecondary?: Record<string, number>,
 ): MetricWithSources {
-  return { ...base, bySource };
+  return bySourceSecondary
+    ? { ...base, bySource, bySourceSecondary }
+    : { ...base, bySource };
 }
 
 // ── Input / output ──────────────────────────────────────────────────────
@@ -236,10 +239,12 @@ export function aggregate(input: AggregateInput): DashboardData {
   const currentOlive = findOliveWeek(olive, weekOf);
   const ga4SourceUsers = ga4UsersBySource(windsor.ga4, currentRange.start, currentRange.end);
   const conversionRateBySource: Record<string, number> = {};
+  const conversionCountBySource: Record<string, number> = {};
   if (currentOlive) {
     for (const src of ['googleAds', 'metaAds', 'organic', 'direct'] as BookingSource[]) {
       const rate = safeDiv(currentOlive.bookings[src], ga4SourceUsers[src]);
       conversionRateBySource[src] = rate ?? 0;
+      conversionCountBySource[src] = currentOlive.bookings[src];
     }
   }
 
@@ -312,6 +317,7 @@ export function aggregate(input: AggregateInput): DashboardData {
       conversionRate: metricWithSources(
         metricBasic(conversionRateSeries, conversionRatePY),
         conversionRateBySource,
+        conversionCountBySource,
       ),
       googleAdsSpend: metricBasic(googleAdsSpendSeries, googleAdsSpendPY),
       metaAdsSpend: metricBasic(metaSpendSeries, metaSpendPY),

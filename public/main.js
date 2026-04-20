@@ -56,15 +56,21 @@ function formatDelta(delta) {
   return sign + pct.toFixed(1) + '%';
 }
 
-function renderSources(bySource, sourceFormat) {
+function renderSources(bySource, sourceFormat, bySourceSecondary) {
   if (!bySource) return '';
   const rows = Object.keys(bySource).map((key) => {
     const label = SOURCE_LABELS[key] || key;
-    const formatted = format(bySource[key], sourceFormat);
+    const primary = format(bySource[key], sourceFormat);
+    let display = primary;
+    if (bySourceSecondary && key in bySourceSecondary) {
+      // Card 3 (Conversion Rate): show "count · rate"
+      const secondary = format(bySourceSecondary[key], 'number');
+      display = secondary + ' · ' + primary;
+    }
     return (
       '<div class="source-row">' +
         '<span class="src-label">' + label + '</span>' +
-        '<span class="src-value">' + formatted + '</span>' +
+        '<span class="src-value">' + display + '</span>' +
       '</div>'
     );
   });
@@ -87,7 +93,7 @@ function renderCard(cfg, metric) {
   const yoyCls = deltaClass(yoy, cfg.goodDirection);
   const historyValues = (metric.history || []).map((p) => p.value);
 
-  const sourcesHTML = cfg.hasSources ? renderSources(metric.bySource, cfg.sourceFormat) : '';
+  const sourcesHTML = cfg.hasSources ? renderSources(metric.bySource, cfg.sourceFormat, metric.bySourceSecondary) : '';
   const sparklineHTML = window.sparkline(historyValues);
 
   return (
