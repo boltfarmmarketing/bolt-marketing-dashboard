@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-28T10:40:28.048Z",
+  "generatedAt": "2026-04-28T10:43:23.304Z",
   "weekOf": {
     "start": "2026-04-20",
     "end": "2026-04-26"
@@ -84,7 +84,7 @@
       ]
     },
     "conversionRate": {
-      "current": 0,
+      "current": 0.0007422330611812109,
       "prior": 0.00044955365744011303,
       "priorYear": 0,
       "history": [
@@ -118,20 +118,20 @@
         },
         {
           "week": "2026-04-20",
-          "value": 0
+          "value": 0.0007422330611812109
         }
       ],
       "bySource": {
-        "googleAds": 0,
-        "metaAds": 0,
+        "googleAds": 0.0010121457489878543,
+        "metaAds": 0.0010057832537088258,
         "organic": 0,
-        "direct": 0
+        "direct": 0.0015178345560333923
       },
       "bySourceSecondary": {
-        "googleAds": 0,
-        "metaAds": 0,
+        "googleAds": 5,
+        "metaAds": 4,
         "organic": 0,
-        "direct": 0
+        "direct": 12
       }
     },
     "googleAdsSpend": {
@@ -213,7 +213,7 @@
       ]
     },
     "costPerBooking": {
-      "current": 0,
+      "current": 298.7333142857143,
       "prior": 474.8780571428571,
       "priorYear": 0,
       "history": [
@@ -244,15 +244,19 @@
         {
           "week": "2026-04-13",
           "value": 474.8780571428571
+        },
+        {
+          "week": "2026-04-20",
+          "value": 298.7333142857143
         }
       ],
       "bySource": {
-        "googleAds": 0,
-        "metaAds": 0
+        "googleAds": 968.4499200000002,
+        "metaAds": 357.7875
       }
     },
     "totalBookingValue": {
-      "current": 0,
+      "current": 53985.96000000001,
       "prior": 42013.44,
       "priorYear": 0,
       "history": [
@@ -286,18 +290,18 @@
         },
         {
           "week": "2026-04-20",
-          "value": 0
+          "value": 53985.96000000001
         }
       ],
       "bySource": {
-        "googleAds": 0,
-        "metaAds": 0,
+        "googleAds": 12854,
+        "metaAds": 10283,
         "organic": 0,
-        "direct": 0
+        "direct": 30849
       }
     },
     "roas": {
-      "current": 0,
+      "current": 8.605535027610866,
       "prior": 6.319432862523746,
       "priorYear": 0,
       "history": [
@@ -331,7 +335,7 @@
         },
         {
           "week": "2026-04-20",
-          "value": 0
+          "value": 8.605535027610866
         }
       ]
     }

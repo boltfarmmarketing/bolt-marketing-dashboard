@@ -45,8 +45,8 @@
     {
       "weekOf": "2026-04-20",
       "notes": "Mon Apr 20 – Sun Apr 26",
-      "bookings": { "googleAds": 0, "metaAds": 0, "organic": 0, "direct": 0 },
-      "avgBookingValue": 0
+      "bookings": { "googleAds": 5, "metaAds": 4, "organic": 0, "direct": 12 },
+      "avgBookingValue": 2570.76
     }
   ]
 }
