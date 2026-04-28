@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-28T10:39:01.012Z",
+  "generatedAt": "2026-04-28T10:40:28.041Z",
   "weekOf": {
     "start": "2026-03-09",
     "end": "2026-03-15"
@@ -45,63 +45,63 @@
       ]
     },
     "totalVisitors": {
-      "current": 4963,
-      "prior": 21835,
-      "priorYear": 46626,
+      "current": 163,
+      "prior": 16694,
+      "priorYear": 46624,
       "history": [
         {
           "week": "2026-01-19",
-          "value": 62860
+          "value": 36533
         },
         {
           "week": "2026-01-26",
-          "value": 46110
+          "value": 27427
         },
         {
           "week": "2026-02-02",
-          "value": 42843
+          "value": 26491
         },
         {
           "week": "2026-02-09",
-          "value": 36444
+          "value": 21543
         },
         {
           "week": "2026-02-16",
-          "value": 32793
+          "value": 24546
         },
         {
           "week": "2026-02-23",
-          "value": 38636
+          "value": 28014
         },
         {
           "week": "2026-03-02",
-          "value": 21835
+          "value": 16694
         },
         {
           "week": "2026-03-09",
-          "value": 4963
+          "value": 163
         }
       ]
     },
     "conversionRate": {
-      "current": 0.0028208744710860366,
-      "prior": 0.0005037783375314861,
+      "current": 0.08588957055214724,
+      "prior": 0.0006589193722295435,
       "priorYear": 0,
       "history": [
         {
           "week": "2026-03-02",
-          "value": 0.0005037783375314861
+          "value": 0.0006589193722295435
         },
         {
           "week": "2026-03-09",
-          "value": 0.0028208744710860366
+          "value": 0.08588957055214724
         }
       ],
       "bySource": {
-        "googleAds": 0.08333333333333333,
+        "googleAds": 0.17647058823529413,
         "metaAds": 0,
         "organic": 0,
-        "direct": 0.024498886414253896
+        "direct": 0.1111111111111111
       },
       "bySourceSecondary": {
         "googleAds": 3,

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-28T10:39:01.009Z",
+  "generatedAt": "2026-04-28T10:40:28.038Z",
   "weekOf": {
     "start": "2026-03-02",
     "end": "2026-03-08"
@@ -45,59 +45,59 @@
       ]
     },
     "totalVisitors": {
-      "current": 21835,
-      "prior": 38636,
-      "priorYear": 39513,
+      "current": 16694,
+      "prior": 28014,
+      "priorYear": 39515,
       "history": [
         {
           "week": "2026-01-12",
-          "value": 76236
+          "value": 47898
         },
         {
           "week": "2026-01-19",
-          "value": 62860
+          "value": 36533
         },
         {
           "week": "2026-01-26",
-          "value": 46110
+          "value": 27427
         },
         {
           "week": "2026-02-02",
-          "value": 42843
+          "value": 26491
         },
         {
           "week": "2026-02-09",
-          "value": 36444
+          "value": 21543
         },
         {
           "week": "2026-02-16",
-          "value": 32793
+          "value": 24546
         },
         {
           "week": "2026-02-23",
-          "value": 38636
+          "value": 28014
         },
         {
           "week": "2026-03-02",
-          "value": 21835
+          "value": 16694
         }
       ]
     },
     "conversionRate": {
-      "current": 0.0005037783375314861,
+      "current": 0.0006589193722295435,
       "prior": 0,
       "priorYear": 0,
       "history": [
         {
           "week": "2026-03-02",
-          "value": 0.0005037783375314861
+          "value": 0.0006589193722295435
         }
       ],
       "bySource": {
         "googleAds": 0,
-        "metaAds": 0.00015730690577316344,
+        "metaAds": 0.0002387774594078319,
         "organic": 0,
-        "direct": 0.0017803097739006587
+        "direct": 0.0019398642095053346
       },
       "bySourceSecondary": {
         "googleAds": 0,

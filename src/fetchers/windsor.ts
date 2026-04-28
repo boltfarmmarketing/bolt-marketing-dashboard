@@ -126,20 +126,39 @@ export interface GA4Row extends WindsorRow {
   date: string;
   source?: string;
   medium?: string;
+  hostname?: string;
   totalusers?: number;
   sessions?: number;
   conversions?: number;
 }
 
+// Returns the comma-separated list of hostnames to exclude from GA4 results.
+// Set GA4_EXCLUDE_HOSTNAMES to filter out e.g. "explore.boltfarmtreehouse.com".
+function excludedHostnames(): string[] {
+  return (process.env.GA4_EXCLUDE_HOSTNAMES ?? '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function dropExcludedHosts<T extends WindsorRow>(rows: T[]): T[] {
+  const excluded = excludedHostnames();
+  if (excluded.length === 0) return rows;
+  return rows.filter((r) => {
+    const host = String(r.hostname ?? '').toLowerCase();
+    return !excluded.includes(host);
+  });
+}
+
 export async function fetchGA4(dateFrom: string, dateTo: string): Promise<GA4Row[]> {
   const rows = await fetchConnector<GA4Row>({
     connector: 'googleanalytics4',
-    fields: ['date', 'source', 'medium', 'totalusers', 'sessions', 'conversions'],
+    fields: ['date', 'source', 'medium', 'hostname', 'totalusers', 'sessions', 'conversions'],
     dateFrom,
     dateTo,
     accountId: process.env.WINDSOR_GA4_PROPERTY_ID,
   });
-  return coerceNumericStrings(rows, ['totalusers', 'sessions', 'conversions']);
+  return dropExcludedHosts(coerceNumericStrings(rows, ['totalusers', 'sessions', 'conversions']));
 }
 
 // Site-wide GA4 totals — query WITHOUT source/medium so `totalusers` is
@@ -147,6 +166,7 @@ export async function fetchGA4(dateFrom: string, dateTo: string): Promise<GA4Row
 // who visited via multiple channels in the same day.
 export interface GA4TotalsRow extends WindsorRow {
   date: string;
+  hostname?: string;
   totalusers?: number;
   sessions?: number;
   conversions?: number;
@@ -155,12 +175,12 @@ export interface GA4TotalsRow extends WindsorRow {
 export async function fetchGA4Totals(dateFrom: string, dateTo: string): Promise<GA4TotalsRow[]> {
   const rows = await fetchConnector<GA4TotalsRow>({
     connector: 'googleanalytics4',
-    fields: ['date', 'totalusers', 'sessions', 'conversions'],
+    fields: ['date', 'hostname', 'totalusers', 'sessions', 'conversions'],
     dateFrom,
     dateTo,
     accountId: process.env.WINDSOR_GA4_PROPERTY_ID,
   });
-  return coerceNumericStrings(rows, ['totalusers', 'sessions', 'conversions']);
+  return dropExcludedHosts(coerceNumericStrings(rows, ['totalusers', 'sessions', 'conversions']));
 }
 
 // ── Combined fetch ──────────────────────────────────────────────────────
