@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-28T10:43:23.295Z",
+  "generatedAt": "2026-04-28T10:52:43.086Z",
   "weekOf": {
     "start": "2026-03-09",
     "end": "2026-03-15"
@@ -7,28 +7,28 @@
   "metrics": {
     "qualifiedLeads": {
       "current": 0,
-      "prior": 1,
+      "prior": 0,
       "priorYear": 0,
       "history": [
         {
           "week": "2026-01-19",
-          "value": 114
+          "value": 0
         },
         {
           "week": "2026-01-26",
-          "value": 139
+          "value": 0
         },
         {
           "week": "2026-02-02",
-          "value": 109
+          "value": 0
         },
         {
           "week": "2026-02-09",
-          "value": 109
+          "value": 0
         },
         {
           "week": "2026-02-16",
-          "value": 89
+          "value": 0
         },
         {
           "week": "2026-02-23",
@@ -36,7 +36,7 @@
         },
         {
           "week": "2026-03-02",
-          "value": 1
+          "value": 0
         },
         {
           "week": "2026-03-09",
@@ -45,63 +45,70 @@
       ]
     },
     "totalVisitors": {
-      "current": 163,
-      "prior": 16694,
-      "priorYear": 46624,
+      "current": 125,
+      "prior": 15839,
+      "priorYear": 43474,
       "history": [
         {
           "week": "2026-01-19",
-          "value": 36533
+          "value": 27842
         },
         {
           "week": "2026-01-26",
-          "value": 27427
+          "value": 21957
         },
         {
           "week": "2026-02-02",
-          "value": 26491
+          "value": 21624
         },
         {
           "week": "2026-02-09",
-          "value": 21543
+          "value": 18847
         },
         {
           "week": "2026-02-16",
-          "value": 24546
+          "value": 22759
         },
         {
           "week": "2026-02-23",
-          "value": 28014
+          "value": 25542
         },
         {
           "week": "2026-03-02",
-          "value": 16694
+          "value": 15839
         },
         {
           "week": "2026-03-09",
-          "value": 163
+          "value": 125
         }
-      ]
+      ],
+      "bySource": {
+        "(direct)": 86,
+        "google": 46,
+        "klaviyo": 5,
+        "facebook": 4,
+        "hs_sms": 3
+      }
     },
     "conversionRate": {
-      "current": 0.08588957055214724,
-      "prior": 0.0006589193722295435,
+      "current": 0.112,
+      "prior": 0.0006944882884020456,
       "priorYear": 0,
       "history": [
         {
           "week": "2026-03-02",
-          "value": 0.0006589193722295435
+          "value": 0.0006944882884020456
         },
         {
           "week": "2026-03-09",
-          "value": 0.08588957055214724
+          "value": 0.112
         }
       ],
       "bySource": {
         "googleAds": 0.17647058823529413,
         "metaAds": 0,
         "organic": 0,
-        "direct": 0.1111111111111111
+        "direct": 0.12790697674418605
       },
       "bySourceSecondary": {
         "googleAds": 3,

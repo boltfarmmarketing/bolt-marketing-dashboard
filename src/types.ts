@@ -25,7 +25,7 @@ export type DashboardData = {
   };
   metrics: {
     qualifiedLeads: MetricBasic;
-    totalVisitors: MetricBasic;
+    totalVisitors: MetricWithSources;
     conversionRate: MetricWithSources;
     googleAdsSpend: MetricBasic;
     metaAdsSpend: MetricBasic;

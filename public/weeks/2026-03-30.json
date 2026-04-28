@@ -1,22 +1,22 @@
 {
-  "generatedAt": "2026-04-28T10:43:23.301Z",
+  "generatedAt": "2026-04-28T10:52:43.090Z",
   "weekOf": {
     "start": "2026-03-30",
     "end": "2026-04-05"
   },
   "metrics": {
     "qualifiedLeads": {
-      "current": 1,
+      "current": 0,
       "prior": 0,
       "priorYear": 1,
       "history": [
         {
           "week": "2026-02-09",
-          "value": 109
+          "value": 0
         },
         {
           "week": "2026-02-16",
-          "value": 89
+          "value": 0
         },
         {
           "week": "2026-02-23",
@@ -24,7 +24,7 @@
         },
         {
           "week": "2026-03-02",
-          "value": 1
+          "value": 0
         },
         {
           "week": "2026-03-09",
@@ -40,80 +40,87 @@
         },
         {
           "week": "2026-03-30",
-          "value": 1
+          "value": 0
         }
       ]
     },
     "totalVisitors": {
-      "current": 49775,
-      "prior": 54179,
-      "priorYear": 47600,
+      "current": 47785,
+      "prior": 51277,
+      "priorYear": 45122,
       "history": [
         {
           "week": "2026-02-09",
-          "value": 21543
+          "value": 18847
         },
         {
           "week": "2026-02-16",
-          "value": 24546
+          "value": 22759
         },
         {
           "week": "2026-02-23",
-          "value": 28014
+          "value": 25542
         },
         {
           "week": "2026-03-02",
-          "value": 16694
+          "value": 15839
         },
         {
           "week": "2026-03-09",
-          "value": 163
+          "value": 125
         },
         {
           "week": "2026-03-16",
-          "value": 22014
+          "value": 21522
         },
         {
           "week": "2026-03-23",
-          "value": 54179
+          "value": 51277
         },
         {
           "week": "2026-03-30",
-          "value": 49775
+          "value": 47785
         }
-      ]
+      ],
+      "bySource": {
+        "facebook": 25480,
+        "google": 10575,
+        "(direct)": 7883,
+        "instagram": 2802,
+        "fb": 1300
+      }
     },
     "conversionRate": {
-      "current": 0.0003214465092918132,
-      "prior": 0.00018457335868140792,
+      "current": 0.0003348331066234174,
+      "prior": 0.00019501920939212514,
       "priorYear": 0,
       "history": [
         {
           "week": "2026-03-02",
-          "value": 0.0006589193722295435
+          "value": 0.0006944882884020456
         },
         {
           "week": "2026-03-09",
-          "value": 0.08588957055214724
+          "value": 0.112
         },
         {
           "week": "2026-03-16",
-          "value": 0.00031797946761151995
+          "value": 0.00032524858284546047
         },
         {
           "week": "2026-03-23",
-          "value": 0.00018457335868140792
+          "value": 0.00019501920939212514
         },
         {
           "week": "2026-03-30",
-          "value": 0.0003214465092918132
+          "value": 0.0003348331066234174
         }
       ],
       "bySource": {
         "googleAds": 0.000855614973262032,
         "metaAds": 0,
         "organic": 0,
-        "direct": 0.001516300227445034
+        "direct": 0.001522263097805404
       },
       "bySourceSecondary": {
         "googleAds": 4,

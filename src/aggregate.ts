@@ -158,6 +158,10 @@ export interface WindsorSlice {
   meta: MetaRow[];
   ga4: GA4Row[];
   ga4Totals: GA4TotalsRow[];
+  // Map of week-start (YYYY-MM-DD Monday) → true GA4 unique users for that week,
+  // computed via per-week GA4 queries (no date dim) so users aren't counted once
+  // per day they visited.
+  weeklyUniques: Map<string, number>;
 }
 
 export interface AggregateInput {
@@ -184,12 +188,25 @@ export function aggregate(input: AggregateInput): DashboardData {
   });
   const qualifiedLeadsPY = countHubSpotLeads(hubspotPriorYear, pyRange.start, pyRange.end);
 
-  // ── Total Visitors (GA4) ──────────────────────────────────────────────
+  // ── Total Visitors (GA4 weekly uniques) ───────────────────────────────
   const visitorsSeries = buildSeries<number | null>(weekStarts, (w) => {
-    const { start, end } = weekRange(w);
-    return sumGA4Users(windsor.ga4Totals, start, end);
+    return windsor.weeklyUniques.get(w) ?? null;
   });
-  const visitorsPY = sumGA4Users(windsorPriorYear.ga4Totals, pyRange.start, pyRange.end);
+  const visitorsPY = windsorPriorYear.weeklyUniques.get(priorYearWeek) ?? 0;
+
+  // Top 5 traffic sources for the active week (ranking only — uses
+  // source-broken-out rows, which are daily-uniques summed across days).
+  const visitorsTopSources: Record<string, number> = (() => {
+    const cur = weekRange(weekOf);
+    const bySrc: Record<string, number> = {};
+    for (const r of windsor.ga4) {
+      if (!inWindow(r.date, cur.start, cur.end)) continue;
+      const src = String(r.source || '(unknown)').toLowerCase();
+      bySrc[src] = (bySrc[src] ?? 0) + (Number(r.totalusers) || 0);
+    }
+    const sorted = Object.entries(bySrc).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    return Object.fromEntries(sorted);
+  })();
 
   // ── Google Ads Spend ──────────────────────────────────────────────────
   const googleAdsSpendSeries = buildSeries<number | null>(weekStarts, (w) => {
@@ -221,17 +238,17 @@ export function aggregate(input: AggregateInput): DashboardData {
 
   // ── Conversion Rate (site-wide + per-source) ──────────────────────────
   const conversionRateSeries = buildSeries<number | null>(weekStarts, (w) => {
-    const { start, end } = weekRange(w);
     const oliveWeek = findOliveWeek(olive, w);
     if (!oliveWeek) return null;
     const bookings = totalBookings(oliveWeek);
-    const users = sumGA4Users(windsor.ga4Totals, start, end);
+    const users = windsor.weeklyUniques.get(w) ?? 0;
     return safeDiv(bookings, users);
   });
   const conversionRatePY = (() => {
     const pyOlive = findOliveWeek(olive, priorYearWeek);
     if (!pyOlive) return null;
-    return safeDiv(totalBookings(pyOlive), sumGA4Users(windsorPriorYear.ga4Totals, pyRange.start, pyRange.end));
+    const users = windsorPriorYear.weeklyUniques.get(priorYearWeek) ?? 0;
+    return safeDiv(totalBookings(pyOlive), users);
   })();
 
   // Per-source conv rate (current week only — sub-lines are snapshot)
@@ -313,7 +330,10 @@ export function aggregate(input: AggregateInput): DashboardData {
     weekOf: weekRange(weekOf),
     metrics: {
       qualifiedLeads: metricBasic(qualifiedLeadsSeries, qualifiedLeadsPY),
-      totalVisitors: metricBasic(visitorsSeries, visitorsPY),
+      totalVisitors: metricWithSources(
+        metricBasic(visitorsSeries, visitorsPY),
+        visitorsTopSources,
+      ),
       conversionRate: metricWithSources(
         metricBasic(conversionRateSeries, conversionRatePY),
         conversionRateBySource,

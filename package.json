@@ -13,7 +13,8 @@
     "windsor:discover": "tsx src/bin/discover-windsor.ts",
     "windsor:fetch": "tsx src/bin/fetch-windsor.ts",
     "hubspot:fetch": "tsx src/bin/fetch-hubspot.ts",
-    "olive:check": "tsx src/bin/check-olive.ts"
+    "olive:check": "tsx src/bin/check-olive.ts",
+    "ga4:hostnames": "tsx src/bin/check-ga4-hostnames.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5"

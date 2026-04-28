@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
-import { fetchGoogleAds, fetchMeta, fetchGA4, fetchGA4Totals } from './fetchers/windsor.js';
+import { fetchGoogleAds, fetchMeta, fetchGA4, fetchGA4Totals, fetchGA4UniquesForRange } from './fetchers/windsor.js';
 import {
   resolveLeadPipelineByName,
   resolveOwnerIdsByName,
@@ -86,6 +86,38 @@ async function main() {
   ]);
   console.log(`  current: ${hubspot.length}  prior year: ${hubspotPY.length}`);
 
+  // ── GA4 weekly uniques (per-week query for true uniques, not summed dailies) ──
+  // Each Olive week needs its own 7 history weeks before it, so we cover the
+  // full span [shiftWeek(oldest, -7) ... latest]. PY: same shifted 52 weeks.
+  console.log('\n── GA4 weekly uniques ──');
+  const allWeekStarts: string[] = [];
+  for (const ow of oliveHistory) {
+    for (let i = -7; i <= 0; i++) {
+      const ws = shiftWeek(ow.weekOf, i);
+      if (!allWeekStarts.includes(ws)) allWeekStarts.push(ws);
+    }
+  }
+  const allPYWeekStarts = oliveHistory.map((w) => shiftWeek(w.weekOf, -52));
+
+  const weeklyUniquesEntries = await Promise.all(
+    allWeekStarts.map(async (ws) => {
+      const { start, end } = weekRange(ws);
+      const n = await safe(`uniques ${ws}`, () => fetchGA4UniquesForRange(start, end), 0);
+      return [ws, n] as const;
+    }),
+  );
+  const weeklyUniques = new Map(weeklyUniquesEntries);
+
+  const pyUniquesEntries = await Promise.all(
+    allPYWeekStarts.map(async (ws) => {
+      const { start, end } = weekRange(ws);
+      const n = await safe(`PY uniques ${ws}`, () => fetchGA4UniquesForRange(start, end), 0);
+      return [ws, n] as const;
+    }),
+  );
+  const pyWeeklyUniques = new Map(pyUniquesEntries);
+  console.log(`  ${weeklyUniques.size} current + ${pyWeeklyUniques.size} prior-year`);
+
   // ── Aggregate every Olive week ──────────────────────────────────────
   console.log('\n── Aggregating per week ──');
   await mkdir(WEEKS_DIR, { recursive: true });
@@ -94,8 +126,8 @@ async function main() {
   for (const oliveWeek of oliveHistory) {
     const d = aggregate({
       weekOf: oliveWeek.weekOf,
-      windsor: { googleAds, meta, ga4, ga4Totals },
-      windsorPriorYear: { googleAds: googleAdsPY, meta: metaPY, ga4: ga4PY, ga4Totals: ga4TotalsPY },
+      windsor: { googleAds, meta, ga4, ga4Totals, weeklyUniques },
+      windsorPriorYear: { googleAds: googleAdsPY, meta: metaPY, ga4: ga4PY, ga4Totals: ga4TotalsPY, weeklyUniques: pyWeeklyUniques },
       hubspot,
       hubspotPriorYear: hubspotPY,
       olive: oliveHistory,

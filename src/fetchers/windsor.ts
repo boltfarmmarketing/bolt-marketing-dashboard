@@ -132,21 +132,23 @@ export interface GA4Row extends WindsorRow {
   conversions?: number;
 }
 
-// Returns the comma-separated list of hostnames to exclude from GA4 results.
-// Set GA4_EXCLUDE_HOSTNAMES to filter out e.g. "explore.boltfarmtreehouse.com".
-function excludedHostnames(): string[] {
-  return (process.env.GA4_EXCLUDE_HOSTNAMES ?? '')
+// Allowlist: GA4 rows are kept ONLY if their hostname matches one of these.
+// Set GA4_INCLUDE_HOSTNAMES (comma-separated) to e.g.
+// "www.boltfarmtreehouse.com,boltfarmtreehouse.com". Everything else (staging,
+// localhost, third-party hostnames) is dropped. Empty = no filter.
+function includedHostnames(): string[] {
+  return (process.env.GA4_INCLUDE_HOSTNAMES ?? '')
     .split(',')
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
 }
 
 function dropExcludedHosts<T extends WindsorRow>(rows: T[]): T[] {
-  const excluded = excludedHostnames();
-  if (excluded.length === 0) return rows;
+  const include = includedHostnames();
+  if (include.length === 0) return rows;
   return rows.filter((r) => {
     const host = String(r.hostname ?? '').toLowerCase();
-    return !excluded.includes(host);
+    return include.includes(host);
   });
 }
 
@@ -181,6 +183,22 @@ export async function fetchGA4Totals(dateFrom: string, dateTo: string): Promise<
     accountId: process.env.WINDSOR_GA4_PROPERTY_ID,
   });
   return dropExcludedHosts(coerceNumericStrings(rows, ['totalusers', 'sessions', 'conversions']));
+}
+
+// True unique-users count over a date range. GA4 dedupes within the query
+// scope — querying without the `date` dimension returns one totalusers value
+// for the whole range (deduplicated across days). We keep `hostname` so the
+// excluded-hostnames filter still applies.
+export async function fetchGA4UniquesForRange(dateFrom: string, dateTo: string): Promise<number> {
+  const rows = await fetchConnector<GA4TotalsRow>({
+    connector: 'googleanalytics4',
+    fields: ['hostname', 'totalusers'],
+    dateFrom,
+    dateTo,
+    accountId: process.env.WINDSOR_GA4_PROPERTY_ID,
+  });
+  const filtered = dropExcludedHosts(coerceNumericStrings(rows, ['totalusers']));
+  return filtered.reduce((sum, r) => sum + (Number(r.totalusers) || 0), 0);
 }
 
 // ── Combined fetch ──────────────────────────────────────────────────────

@@ -2,7 +2,7 @@
 
 const METRIC_CONFIG = [
   { key: 'qualifiedLeads',    label: 'Qualified Leads',     format: 'number',  goodDirection: 'up',      hasSources: false },
-  { key: 'totalVisitors',     label: 'Website Visitors',    format: 'number',  goodDirection: 'up',      hasSources: false },
+  { key: 'totalVisitors',     label: 'Website Visitors',    format: 'number',  goodDirection: 'up',      hasSources: true,  sourceFormat: 'number' },
   { key: 'conversionRate',    label: 'Conversion Rate',     format: 'percent', goodDirection: 'up',      hasSources: true,  sourceFormat: 'percent' },
   { key: 'googleAdsSpend',    label: 'Google Ads Spend',    format: 'money',   goodDirection: 'neutral', hasSources: false },
   { key: 'metaAdsSpend',      label: 'Meta Ads Spend',      format: 'money',   goodDirection: 'neutral', hasSources: false },
@@ -16,7 +16,26 @@ const SOURCE_LABELS = {
   metaAds:   'Meta Ads',
   organic:   'Organic',
   direct:    'Direct',
+  '(direct)': 'Direct',
+  '(none)':   'Direct',
+  google:     'Google',
+  facebook:   'Facebook',
+  instagram:  'Instagram',
+  bing:       'Bing',
+  yahoo:      'Yahoo',
+  duckduckgo: 'DuckDuckGo',
+  'l.instagram.com': 'Instagram',
+  'm.facebook.com':  'Facebook',
+  'l.facebook.com':  'Facebook',
 };
+
+function humanSource(key) {
+  if (SOURCE_LABELS[key]) return SOURCE_LABELS[key];
+  // Fallback: strip parens, title-case the dotless first segment.
+  const cleaned = String(key).replace(/[()]/g, '');
+  const head = cleaned.split('.')[0] || cleaned;
+  return head.charAt(0).toUpperCase() + head.slice(1);
+}
 
 const FORMATTERS = {
   money:   (n) => '$' + Math.round(n).toLocaleString('en-US'),
@@ -59,7 +78,7 @@ function formatDelta(delta) {
 function renderSources(bySource, sourceFormat, bySourceSecondary) {
   if (!bySource) return '';
   const rows = Object.keys(bySource).map((key) => {
-    const label = SOURCE_LABELS[key] || key;
+    const label = humanSource(key);
     const primary = format(bySource[key], sourceFormat);
     let display = primary;
     if (bySourceSecondary && key in bySourceSecondary) {
