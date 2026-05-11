@@ -1,7 +1,6 @@
-// Dashboard renderer. Reads public/data.json and paints 8 KPI cards.
+// Dashboard renderer. Reads public/data.json and paints 7 KPI cards.
 
 const METRIC_CONFIG = [
-  { key: 'qualifiedLeads',    label: 'Qualified Leads',     format: 'number',  goodDirection: 'up',      hasSources: false },
   { key: 'totalVisitors',     label: 'Website Visitors',    format: 'number',  goodDirection: 'up',      hasSources: true,  sourceFormat: 'number' },
   { key: 'conversionRate',    label: 'Conversion Rate',     format: 'percent', goodDirection: 'up',      hasSources: true,  sourceFormat: 'percent' },
   { key: 'googleAdsSpend',    label: 'Google Ads Spend',    format: 'money',   goodDirection: 'neutral', hasSources: false },
