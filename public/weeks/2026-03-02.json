@@ -1,38 +1,38 @@
 {
-  "generatedAt": "2026-05-11T13:55:30.680Z",
+  "generatedAt": "2026-05-18T14:27:46.882Z",
   "weekOf": {
     "start": "2026-03-02",
     "end": "2026-03-08"
   },
   "metrics": {
     "qualifiedLeads": {
-      "current": 0,
+      "current": 1,
       "prior": 0,
       "priorYear": 0,
       "history": [
         {
           "week": "2026-01-12",
-          "value": 0
+          "value": 152
         },
         {
           "week": "2026-01-19",
-          "value": 0
+          "value": 114
         },
         {
           "week": "2026-01-26",
-          "value": 0
+          "value": 139
         },
         {
           "week": "2026-02-02",
-          "value": 0
+          "value": 109
         },
         {
           "week": "2026-02-09",
-          "value": 0
+          "value": 109
         },
         {
           "week": "2026-02-16",
-          "value": 0
+          "value": 89
         },
         {
           "week": "2026-02-23",
@@ -40,7 +40,7 @@
         },
         {
           "week": "2026-03-02",
-          "value": 0
+          "value": 1
         }
       ]
     },
