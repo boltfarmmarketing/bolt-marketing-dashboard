@@ -153,6 +153,28 @@ export async function fetchTrafficData(today = new Date(), rangeDays = 30): Prom
 // and dev/preview hostnames are excluded. Override via env if the domain changes.
 const PRIMARY_HOSTNAME = process.env.WINDSOR_PRIMARY_HOSTNAME || "www.boltfarmtreehouse.com";
 
+/**
+ * GA4 snapshot for one specific day, plus the prior 7-day window as a baseline
+ * for the "vs 7-day avg" comparison pills.
+ */
+export async function fetchDaySnapshot(
+  day: string
+): Promise<{ dateLabel: string; day: ChannelRow[]; trailing7: ChannelRow[] }> {
+  const d = new Date(day + "T00:00:00Z");
+  const minus = (n: number) => isoDate(new Date(d.getTime() - n * 86400000));
+  const [dayRows, weekRows] = await Promise.all([
+    windsorFetch(GA4, { from: day, to: day, fields: ga4Fields(false) }),
+    windsorFetch(GA4, { from: minus(7), to: minus(1), fields: ga4Fields(false) }),
+  ]);
+  return {
+    dateLabel: d.toLocaleDateString("en-US", {
+      weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC",
+    }),
+    day: aggregateChannels(dayRows),
+    trailing7: aggregateChannels(weekRows),
+  };
+}
+
 /** GA4 visitors for a week on the primary hostname, with a by-source breakdown. */
 export async function fetchVisitors(from: string, to: string): Promise<{ total: number; bySource: Record<string, number> }> {
   const rows = await windsorFetch(GA4, { from, to, fields: [F.hostname, F.source, F.sessions] });

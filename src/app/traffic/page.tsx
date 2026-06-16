@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import DayPicker from "@/components/DayPicker";
 import Nav from "@/components/Nav";
 import RangePicker from "@/components/RangePicker";
 import { ChannelBarChart, DailyTrendChart } from "@/components/TrafficCharts";
@@ -7,7 +8,22 @@ import {
   colorFor, fmtDur, fmtNum, pct, qLabel, qScore, totals, trendPill,
 } from "@/lib/traffic-utils";
 import type { ChannelRow, TrafficData } from "@/lib/types";
-import { fetchTrafficData } from "@/lib/windsor";
+import { fetchDaySnapshot, fetchTrafficData } from "@/lib/windsor";
+
+type DaySnapshot = { dateLabel: string; day: ChannelRow[]; trailing7: ChannelRow[] };
+
+/** Load one day's at-a-glance snapshot (live, cached 30 min) with a snapshot fallback. */
+async function loadDaySnapshot(day: string): Promise<DaySnapshot> {
+  if (process.env.WINDSOR_API_KEY) {
+    try {
+      return await unstable_cache(() => fetchDaySnapshot(day), ["day-snapshot", day], { revalidate: 1800 })();
+    } catch {
+      /* fall through to snapshot */
+    }
+  }
+  const snap = await store.getTraffic();
+  return { dateLabel: snap.yesterdayDate, day: snap.yesterday, trailing7: snap.week };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -59,17 +75,22 @@ function buildInsights(channel: ChannelRow[], daily: { date: string; sessions: n
 export default async function TrafficPage({
   searchParams,
 }: {
-  searchParams: Promise<{ range?: string }>;
+  searchParams: Promise<{ range?: string; day?: string }>;
 }) {
-  const { range } = await searchParams;
+  const { range, day: rawDay } = await searchParams;
   const days = ALLOWED_RANGES.includes(Number(range)) ? Number(range) : 30;
-  const data = await loadTraffic(days);
+  const yesterdayIso = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const day =
+    rawDay && /^\d{4}-\d{2}-\d{2}$/.test(rawDay) && rawDay <= yesterdayIso ? rawDay : yesterdayIso;
+
+  const [data, daySnap] = await Promise.all([loadTraffic(days), loadDaySnapshot(day)]);
   const rangeDays = data.rangeDays ?? days;
-  const yday = totals(data.yesterday);
-  const wk = totals(data.week);
+
+  const yday = totals(daySnap.day);
+  const wk = totals(daySnap.trailing7);
   const wkDailyAvg = wk.sessions / 7;
+  const wkMap = new Map(daySnap.trailing7.map((r) => [r.name, r]));
   const period = totals(data.channel);
-  const wkMap = new Map(data.week.map((r) => [r.name, r]));
   const insights = buildInsights(data.channel, data.daily);
   const topChannels = data.channel.slice(0, 8);
 
@@ -91,8 +112,13 @@ export default async function TrafficPage({
       <main className="container">
         {/* Yesterday */}
         <section className="yesterday-block">
-          <div className="yday-eyebrow">Yesterday at a glance</div>
-          <h2>{data.yesterdayDate}</h2>
+          <div className="yday-header">
+            <div>
+              <div className="yday-eyebrow">At a glance</div>
+              <h2>{daySnap.dateLabel}</h2>
+            </div>
+            <DayPicker day={day} max={yesterdayIso} />
+          </div>
           <div className="yday-kpi-row">
             <div className="yday-kpi">
               <div className="yk-label">Sessions</div>
@@ -116,7 +142,7 @@ export default async function TrafficPage({
           {yday.bounce >= 0.85 && (
             <div className="yday-alert">
               <strong>Anomaly check</strong>
-              Yesterday&apos;s bounce rate ({pct(yday.bounce)}) is unusually high. This often signals a tracking
+              The bounce rate this day ({pct(yday.bounce)}) is unusually high. This often signals a tracking
               hiccup (e.g. a tag firing twice) rather than a real traffic-quality collapse — verify in GA4 before acting.
             </div>
           )}
@@ -193,11 +219,11 @@ export default async function TrafficPage({
           </div>
         </section>
 
-        {/* Yesterday by channel */}
+        {/* Selected day by channel */}
         <section className="section">
           <div className="section-head">
-            <div className="section-label">Yesterday detail</div>
-            <h2>Yesterday by Channel</h2>
+            <div className="section-label">Day detail</div>
+            <h2>By Channel · {daySnap.dateLabel}</h2>
           </div>
           <div className="table-wrap">
             <table className="data-table">
@@ -205,7 +231,7 @@ export default async function TrafficPage({
                 <tr><th>Channel</th><th>Sessions</th><th>7-day avg/day</th><th>Bounce</th><th>Duration</th></tr>
               </thead>
               <tbody>
-                {data.yesterday.map((r) => {
+                {daySnap.day.map((r) => {
                   const w = wkMap.get(r.name);
                   const avgSess = w ? w.sessions / 7 : null;
                   const sp = avgSess ? trendPill(r.sessions, avgSess, true) : null;

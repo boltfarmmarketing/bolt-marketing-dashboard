@@ -100,6 +100,11 @@ a { color: inherit; }
 .yesterday-block { background: var(--dark-green); border-radius: var(--radius); padding: 32px; margin-bottom: 40px; }
 .yday-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--powder-blue); opacity: .85; margin-bottom: 6px; }
 .yesterday-block h2 { font-size: 20px; font-weight: 400; color: var(--burlywood); margin-bottom: 24px; }
+.yday-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.yday-header h2 { margin-bottom: 0; }
+.day-picker { display: flex; flex-direction: column; gap: 5px; }
+.day-picker label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.6px; color: var(--powder-blue); opacity: .85; }
+.day-input { font-family: 'Ovo', serif; color: var(--dark-slate-grey); }
 .yday-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
 .yday-kpi { background: rgba(255,249,243,.07); border-radius: 12px; padding: 17px 15px; border: 1px solid rgba(183,204,188,.15); }
 .yk-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.6px; color: var(--powder-blue); opacity: .8; margin-bottom: 7px; }
