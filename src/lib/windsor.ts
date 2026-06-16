@@ -21,6 +21,7 @@ const META = process.env.WINDSOR_META_CONNECTOR || "facebook";
 const F = {
   date: "date",
   channel: "default_channel_group", // GA4 "Default channel group"
+  hostname: "hostname",
   source: "source",
   sessions: "sessions",
   users: "active_users",
@@ -135,12 +136,17 @@ export async function fetchTrafficData(today = new Date()): Promise<TrafficData>
   };
 }
 
-/** GA4 visitors for a week, with a by-source breakdown. */
+// Count only the primary marketing site; subdomains (thrive/explore), staging,
+// and dev/preview hostnames are excluded. Override via env if the domain changes.
+const PRIMARY_HOSTNAME = process.env.WINDSOR_PRIMARY_HOSTNAME || "www.boltfarmtreehouse.com";
+
+/** GA4 visitors for a week on the primary hostname, with a by-source breakdown. */
 export async function fetchVisitors(from: string, to: string): Promise<{ total: number; bySource: Record<string, number> }> {
-  const rows = await windsorFetch(GA4, { from, to, fields: [F.source, F.sessions] });
+  const rows = await windsorFetch(GA4, { from, to, fields: [F.hostname, F.source, F.sessions] });
   const bySource: Record<string, number> = {};
   let total = 0;
   for (const r of rows) {
+    if (String(r[F.hostname] ?? "") !== PRIMARY_HOSTNAME) continue;
     const s = num(r[F.sessions]);
     total += s;
     const src = String(r[F.source] ?? "(direct)");
