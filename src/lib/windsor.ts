@@ -28,8 +28,16 @@ const F = {
   bounceRate: "bounce_rate", // 0..1
   avgDuration: "average_session_duration", // seconds
   engagementRate: "engagement_rate", // 0..1
+  campaign: "campaign",
   spend: "spend",
 };
+
+// Meta campaigns whose names contain any of these (case-insensitive) are
+// non-treehouse business lines and excluded from Meta Ads Spend. Override via env.
+const META_EXCLUDE_CAMPAIGNS = (process.env.WINDSOR_META_EXCLUDE_CAMPAIGNS || "coaching,thrive")
+  .split(",")
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
 
 function requireKey(): string {
   const key = process.env.WINDSOR_API_KEY;
@@ -155,9 +163,20 @@ export async function fetchVisitors(from: string, to: string): Promise<{ total: 
   return { total, bySource };
 }
 
-/** Total ad spend for a connector (google_ads / facebook) over a date range. */
+/**
+ * Total ad spend for a connector over a date range.
+ * Meta spend excludes non-treehouse campaigns (Coaching, THRIVE) by name.
+ * Google spend counts all campaigns.
+ */
 export async function fetchAdSpend(connector: "google" | "meta", from: string, to: string): Promise<number> {
-  const c = connector === "google" ? GOOGLE_ADS : META;
-  const rows = await windsorFetch(c, { from, to, fields: [F.spend] });
+  if (connector === "meta") {
+    const rows = await windsorFetch(META, { from, to, fields: [F.campaign, F.spend] });
+    return rows.reduce((sum, r) => {
+      const name = String(r[F.campaign] ?? "").toLowerCase();
+      if (META_EXCLUDE_CAMPAIGNS.some((p) => name.includes(p))) return sum;
+      return sum + num(r[F.spend]);
+    }, 0);
+  }
+  const rows = await windsorFetch(GOOGLE_ADS, { from, to, fields: [F.spend] });
   return rows.reduce((sum, r) => sum + num(r[F.spend]), 0);
 }
