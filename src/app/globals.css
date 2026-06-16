@@ -1,0 +1,184 @@
+/* ─────────────────────────────────────────────────────────────
+   Bolt Farm Treehouse — brand tokens + shared dashboard styles
+   (palette + type per Bolt Farm brand standards)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --dark-green: #335338;
+  --dark-green-deep: #2a3c30;
+  --dark-slate-grey: #383a42;
+  --seashell: #fff9f3;
+  --white: #fefdfb;
+  --sienna: #866042;
+  --burlywood: #ddc087;
+  --powder-blue: #b7ccbc;
+  --radius: 16px;
+
+  --good: #4f8a57;
+  --good-on-dark: #7fd18a;
+  --bad: #b4604f;
+  --bad-on-dark: #e88a8a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Ovo', serif;
+  background: var(--seashell);
+  color: var(--dark-slate-grey);
+  line-height: 1.7;
+  font-weight: 400;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(165deg, #2a3c30 0%, var(--dark-green) 40%, #3a5f4f 70%, var(--powder-blue) 100%);
+  padding: 52px 24px 44px;
+  text-align: center;
+  color: var(--white);
+}
+.hero-inner { max-width: 900px; margin: 0 auto; }
+.eyebrow {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2.2px;
+  color: var(--powder-blue); opacity: .85; margin-bottom: 14px;
+}
+.hero h1 { font-size: clamp(1.9rem, 4.5vw, 2.9rem); font-weight: 400; line-height: 1.15; margin-bottom: 12px; }
+.hero h1 em { font-style: italic; color: var(--burlywood); }
+.hero-subtitle { font-size: 15px; opacity: .82; max-width: 520px; margin: 0 auto; text-wrap: balance; }
+.hero-meta { margin-top: 16px; font-size: 12px; opacity: .55; letter-spacing: .4px; }
+
+/* ── Sticky nav ── */
+.sticky-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white); border-bottom: 1px solid rgba(56,58,66,.12);
+  padding: 13px 24px; display: flex; justify-content: center; gap: 28px; flex-wrap: wrap;
+}
+.sticky-nav a { font-size: 13px; color: var(--dark-slate-grey); text-decoration: none; opacity: .6; transition: opacity .2s; }
+.sticky-nav a:hover, .sticky-nav a.active { opacity: 1; }
+
+/* ── Layout ── */
+.container { max-width: 980px; margin: 0 auto; padding: 44px 24px 80px; }
+.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2.2px; color: var(--sienna); margin-bottom: 10px; }
+.section-head { margin-bottom: 20px; }
+.section-head h2 { font-size: 22px; font-weight: 400; }
+.section { margin-bottom: 44px; }
+
+/* ── Cards ── */
+.card {
+  background: var(--white); border-radius: var(--radius); padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.02);
+  border: 1px solid rgba(183,204,188,.2);
+}
+
+/* ── KPI grid (marketing) ── */
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.kpi-card {
+  background: var(--white); border-radius: var(--radius); padding: 22px 24px;
+  border: 1px solid rgba(183,204,188,.2);
+  box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.02);
+}
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.6px; color: var(--sienna); margin-bottom: 8px; }
+.kpi-value { font-size: 2rem; line-height: 1.1; margin-bottom: 8px; }
+.kpi-deltas { display: flex; gap: 14px; font-size: 12.5px; flex-wrap: wrap; }
+.delta .good { color: var(--good); }
+.delta .bad { color: var(--bad); }
+.delta .flat { color: rgba(56,58,66,.45); }
+.kpi-sources { margin-top: 14px; font-size: 12px; color: rgba(56,58,66,.7); }
+.kpi-sources .src-row { display: flex; justify-content: space-between; padding: 3px 0; border-top: 1px solid rgba(56,58,66,.08); }
+.spark { margin-top: 14px; }
+
+/* ── Delta pills ── */
+.delta-up { color: var(--good-on-dark); }
+.delta-down { color: var(--bad-on-dark); }
+.delta-neu { color: rgba(255,249,243,.45); }
+
+/* ── Yesterday block (traffic) ── */
+.yesterday-block { background: var(--dark-green); border-radius: var(--radius); padding: 32px; margin-bottom: 40px; }
+.yday-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--powder-blue); opacity: .85; margin-bottom: 6px; }
+.yesterday-block h2 { font-size: 20px; font-weight: 400; color: var(--burlywood); margin-bottom: 24px; }
+.yday-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.yday-kpi { background: rgba(255,249,243,.07); border-radius: 12px; padding: 17px 15px; border: 1px solid rgba(183,204,188,.15); }
+.yk-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.6px; color: var(--powder-blue); opacity: .8; margin-bottom: 7px; }
+.yk-value { font-size: 1.65rem; color: var(--white); line-height: 1.1; margin-bottom: 5px; }
+.yk-delta { font-size: 12px; }
+.yday-alert { background: rgba(221,192,135,.13); border-left: 3px solid var(--burlywood); border-radius: 0 10px 10px 0; padding: 13px 17px; margin-bottom: 4px; font-size: 13px; color: rgba(255,249,243,.8); }
+.yday-alert strong { color: var(--burlywood); display: block; margin-bottom: 3px; }
+
+/* ── KPI row (light) ── */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.kpi-row .kpi-card { padding: 20px; }
+
+/* ── Tables ── */
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid rgba(56,58,66,.1); }
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; background: var(--white); }
+.data-table thead th {
+  background: var(--dark-green); color: var(--white); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 1.5px; padding: 13px 18px; text-align: left; font-weight: 400;
+}
+.data-table tbody td { padding: 12px 18px; border-bottom: 1px solid rgba(56,58,66,.12); }
+.data-table tbody tr:nth-child(even) td { background: rgba(0,0,0,.015); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+
+/* ── Trend pills ── */
+.trend-pill { font-size: 11px; padding: 1px 6px; border-radius: 6px; margin-left: 5px; }
+.trend-good { color: var(--good); background: rgba(79,138,87,.12); }
+.trend-bad { color: var(--bad); background: rgba(180,96,79,.12); }
+.trend-neu { color: rgba(56,58,66,.45); }
+
+/* ── Quality labels ── */
+.q-excellent { color: var(--good); }
+.q-good { color: #6a9c70; }
+.q-fair { color: var(--sienna); }
+.q-poor { color: var(--bad); }
+
+/* ── Chart card ── */
+.chart-card { background: var(--white); border-radius: var(--radius); padding: 24px; border: 1px solid rgba(183,204,188,.2); box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.chart-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.chart-box { position: relative; height: 260px; }
+
+/* ── Callout / insights ── */
+.callout { background: rgba(221,192,135,.1); border-left: 3px solid var(--sienna); border-radius: 0 16px 16px 0; padding: 18px 22px; margin: 14px 0; font-size: 14px; }
+.callout strong { color: var(--sienna); display: block; margin-bottom: 4px; }
+.insight-tag { display: inline-block; font-size: 10px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--sienna); margin-bottom: 4px; }
+
+/* ── Week picker ── */
+.pick-select, .admin-input, .admin-select {
+  font-family: 'Ovo', serif; font-size: 14px; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid rgba(56,58,66,.25); background: var(--white); color: var(--dark-slate-grey);
+}
+.week-picker { margin-top: 18px; }
+
+/* ── Footer ── */
+.footer {
+  text-align: center; padding: 30px 24px 10px; font-size: 12px;
+  color: var(--dark-slate-grey); opacity: .55; max-width: 980px; margin: 0 auto;
+  border-top: 1px solid rgba(56,58,66,.12);
+}
+.footer-sep { margin: 0 8px; }
+
+/* ── Buttons ── */
+.btn-gold {
+  background: var(--burlywood); color: var(--dark-slate-grey); border: 2px solid var(--burlywood);
+  font-family: 'Ovo', serif; font-size: 15px; padding: 13px 32px; border-radius: var(--radius);
+  text-decoration: none; cursor: pointer; transition: all .2s ease; display: inline-block;
+}
+.btn-gold:hover { filter: brightness(1.04); }
+
+/* ── Admin ── */
+.admin-form { display: grid; gap: 18px; max-width: 560px; }
+.admin-field { display: flex; flex-direction: column; gap: 6px; }
+.admin-field label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--sienna); }
+.admin-field .hint { font-size: 12px; color: rgba(56,58,66,.6); text-transform: none; letter-spacing: 0; }
+.notice { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 18px; }
+.notice.ok { background: rgba(79,138,87,.12); color: var(--good); }
+.notice.err { background: rgba(180,96,79,.12); color: var(--bad); }
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+  .yday-kpi-row, .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .chart-grid { grid-template-columns: 1fr; }
+}
