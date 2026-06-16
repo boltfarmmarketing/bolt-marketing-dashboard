@@ -1,9 +1,10 @@
 node_modules
-dist
+.next
+out
+.vercel
 .env
-.env.local
-*.log
-.DS_Store
-
-# Raw CSVs and Windsor snapshots for debugging — per plan's "Things That Will Bite You"
-data/debug/
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+# Local JSON store written by the admin form during `next dev`
+/data/store/

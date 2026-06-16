@@ -1,59 +1,104 @@
-# Bolt Farm Marketing Dashboard
+# Bolt Farm Treehouse — Marketing Analytics Dashboard
 
-Weekly marketing KPI dashboard for Bolt Farm Treehouse leadership. Seven core metrics (plus ROAS) pulled from HubSpot, GA4, Google Ads, Meta, and Olive, refreshed weekly, displayed on a branded static site hosted on Netlify.
+A stable, auto-updating replacement for the two hand-maintained Netlify dashboards
+([weekly marketing report](https://boltfarm-marketing-dashboard.netlify.app/) and
+[traffic analytics](https://boltfarm.netlify.app/traffic-analytics/)), rebuilt as one
+Next.js app on Vercel.
 
-## Status
+- **`/`** — Weekly Marketing Report (visitors, leads, conversion, ad spend, cost/booking, booking value, ROAS)
+- **`/traffic`** — Traffic Analytics (yesterday, 30-day, daily trend, by-channel, comparisons, insights)
+- **`/admin`** — password-protected form for the numbers that can't be pulled automatically
 
-Step 1 (scaffold) and step 2 (static dashboard against mock data) are the current focus. Live data wiring comes in steps 3–7.
+Data auto-refreshes on a schedule; manual numbers are entered in the admin form; the two are
+merged at render time.
 
-## How it refreshes
-
-1. You drop the Olive weekly bookings CSV into `data/olive/YYYY-MM-DD.csv` and commit.
-2. The push triggers `.github/workflows/weekly-refresh.yml`.
-3. The Action runs the Node orchestrator: Windsor.ai pulls Google Ads / Meta / GA4 / HubSpot, the CSV parser reads the newest Olive file, `aggregate.ts` computes deltas and source breakdowns, the result is written to `public/data.json`.
-4. The Action commits `public/data.json` back to the repo.
-5. Netlify auto-deploys from `public/`.
-
-No cron — refresh is push-driven off the Olive CSV drop. Manual run available via GitHub Actions "Run workflow".
-
-## Local dev
+## How data flows
 
 ```
+Windsor.ai (GA4 + Google Ads + Meta Ads) ──► cron jobs ─► base data ─┐
+                                              (weekly/daily)          ├─► merged ─► dashboards
+Admin form (bookings, total booking value) ─────────────────────────►┘
+                                              (Conversion Rate, Cost/Booking & ROAS are derived)
+```
+
+| Metric | Source |
+|---|---|
+| Website Visitors (+ by source) | GA4 via Windsor.ai |
+| Google / Meta Ads Spend | Windsor.ai |
+| Bookings, Total Booking Value | **manual** (admin form) |
+| Booking Conversion Rate | **derived** (bookings ÷ visitors) |
+| Cost Per Booking, ROAS | **derived** from the above |
+| All traffic-analytics data | GA4 via Windsor.ai |
+
+## Storage
+
+- **Production:** Postgres (Neon, via the Vercel Marketplace). Set `DATABASE_URL`.
+- **No DB set:** the app runs read-only from the committed seed snapshots in
+  `src/data/seed/` (real data from the old dashboards), and the admin form writes to local
+  files under `data/store/` — fine for local dev, not for production.
+
+## Local development
+
+```bash
 npm install
-npm run typecheck
+cp .env.example .env.local   # set ADMIN_PASSWORD at minimum
+npm run dev                  # http://localhost:3000
 ```
 
-The static site is `public/index.html` — open it directly in a browser, no build step.
+With no `DATABASE_URL`, you immediately get the dashboards populated from seed data, and the
+admin form persists to `data/store/` locally.
 
-### Windsor.ai testing (step 3)
+## Deploy to Vercel
 
-Once `WINDSOR_API_KEY` and the per-source account IDs are in `.env`:
+1. Push this repo to GitHub and import it at [vercel.com/new](https://vercel.com/new).
+2. **Add a database:** Vercel project → Storage → Marketplace → **Neon** (Postgres). This sets
+   `DATABASE_URL` automatically.
+3. **Set environment variables** (Project → Settings → Environment Variables) — see `.env.example`:
+   - `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`
+   - `CRON_SECRET` (generate with `openssl rand -hex 32`)
+   - `WINDSOR_API_KEY`
+4. **Seed the database** with the historical weeks (once): `npm run seed:db` locally with
+   `DATABASE_URL` in `.env.local`, or hit the backfill endpoints (below).
+5. Deploy. The cron jobs in `vercel.json` run automatically:
+   - `/api/cron/traffic` — daily at 11:00 UTC (~6 AM Central)
+   - `/api/cron/marketing` — Mondays at 12:00 UTC
+
+## Connecting the live data sources
+
+The connector field mappings use Windsor.ai's GA4 defaults. To wire your account:
+
+1. **Windsor.ai** — get your API key (windsor.ai → API). Confirm the connector slugs for GA4,
+   Google Ads, and Meta match `WINDSOR_*_CONNECTOR` in `.env.example`. If Windsor renamed any
+   fields for your account, adjust the `F` map in [`src/lib/windsor.ts`](src/lib/windsor.ts) once
+   (open a connector URL with `&fields=...` to see exact keys).
+2. **Test a pull** (replace the secret):
+   ```bash
+   curl -H "Authorization: Bearer $CRON_SECRET" https://<your-app>.vercel.app/api/cron/traffic
+   curl -H "Authorization: Bearer $CRON_SECRET" "https://<your-app>.vercel.app/api/cron/marketing?week=2026-05-11"
+   ```
+   The `?week=` param backfills a specific week.
+
+## Project layout
 
 ```
-npm run windsor:discover   # Lists available fields per connector — run first, confirm field names match src/fetchers/windsor.ts
-npm run windsor:fetch      # Pulls last 7 days from all 4 sources, dumps a sample row
-```
-
-Adjust the `fields:` arrays in `src/fetchers/windsor.ts` if `discover` reveals different names for your account (especially likely for GA4 and HubSpot).
-
-## Environment
-
-See `.env.example`. Secrets live in GitHub Actions → Settings → Secrets → Actions, not in the repo.
-
-## File layout
-
-```
-.github/workflows/weekly-refresh.yml   Push-driven refresh job
 src/
-  fetchers/windsor.ts                  Windsor.ai API client
-  fetchers/olive.ts                    CSV parser for data/olive/ (step 4)
-  bin/discover-windsor.ts              CLI — lists Windsor fields per connector
-  bin/fetch-windsor.ts                 CLI — pulls last 7d, dumps sample rows
-  aggregate.ts                         Derives rates, deltas, source splits (step 5)
-  index.ts                             Orchestrator
-  types.ts                             Dashboard data schema
-public/
-  index.html  styles.css  main.js  sparkline.js
-  data.json                            Committed by the Action each week
-data/olive/                            You drop weekly CSVs here
+  app/
+    page.tsx                 Weekly Marketing Report
+    traffic/page.tsx         Traffic Analytics
+    admin/                   Auth + manual-data form (server actions)
+    api/
+      marketing|traffic/     JSON read endpoints
+      cron/marketing|traffic/  Scheduled pulls (CRON_SECRET-protected)
+  components/                Nav, WeekPicker, Sparkline, TrafficCharts
+  lib/
+    store.ts                 Postgres / file+seed adapter
+    windsor.ts               Windsor.ai connector (GA4 + Google/Meta Ads)
+    marketing-pipeline.ts    Weekly assembly
+    metrics.ts               Manual overlay + derivations
+    types.ts, auth.ts, traffic-utils.ts
+  data/seed/                 Real historical snapshots (seed)
+scripts/seed-db.mjs          Load seed → Postgres
+vercel.json                  Cron schedules
 ```
+
+Styling follows the Bolt Farm Treehouse brand standards (Ovo serif, forest-green palette).
