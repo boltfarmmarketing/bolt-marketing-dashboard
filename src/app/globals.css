@@ -104,7 +104,12 @@ a { color: inherit; }
 .yday-kpi { background: rgba(255,249,243,.07); border-radius: 12px; padding: 17px 15px; border: 1px solid rgba(183,204,188,.15); }
 .yk-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.6px; color: var(--powder-blue); opacity: .8; margin-bottom: 7px; }
 .yk-value { font-size: 1.65rem; color: var(--white); line-height: 1.1; margin-bottom: 5px; }
-.yk-delta { font-size: 12px; }
+.yk-delta { font-size: 12px; color: rgba(255, 249, 243, 0.7); }
+/* Delta pills sit on the dark-green block here — use light-on-dark colors */
+.yesterday-block .trend-pill { background: transparent; padding: 0; margin-left: 0; }
+.yesterday-block .trend-pill.trend-good { color: var(--good-on-dark); }
+.yesterday-block .trend-pill.trend-bad { color: var(--bad-on-dark); }
+.yesterday-block .trend-pill.trend-neu { color: rgba(255, 249, 243, 0.5); }
 .yday-alert { background: rgba(221,192,135,.13); border-left: 3px solid var(--burlywood); border-radius: 0 10px 10px 0; padding: 13px 17px; margin-bottom: 4px; font-size: 13px; color: rgba(255,249,243,.8); }
 .yday-alert strong { color: var(--burlywood); display: block; margin-bottom: 3px; }
 

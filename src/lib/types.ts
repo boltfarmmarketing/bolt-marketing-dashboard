@@ -53,6 +53,7 @@ export type TrafficData = {
   generatedAt: string;
   yesterdayDate: string;
   rangeLabel: string;
+  rangeDays?: number;
   yesterday: ChannelRow[];
   week: ChannelRow[];
   channel: ChannelRow[];

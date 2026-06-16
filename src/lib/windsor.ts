@@ -103,8 +103,12 @@ const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 const MMMD = (iso: string) =>
   new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
-/** Build the full traffic dashboard payload from GA4 (yesterday, last 7d, last 30d, daily trend). */
-export async function fetchTrafficData(today = new Date()): Promise<TrafficData> {
+/**
+ * Build the full traffic dashboard payload from GA4: yesterday, last 7d (for the
+ * yesterday-vs-average pills), and the selected range (overview, channels, daily trend).
+ * `rangeDays` controls the main period (default 30).
+ */
+export async function fetchTrafficData(today = new Date(), rangeDays = 30): Promise<TrafficData> {
   const day = (offset: number) => {
     const d = new Date(today);
     d.setUTCDate(d.getUTCDate() + offset);
@@ -112,13 +116,13 @@ export async function fetchTrafficData(today = new Date()): Promise<TrafficData>
   };
   const yesterday = day(-1);
   const weekStart = day(-7);
-  const monthStart = day(-30);
+  const rangeStart = day(-rangeDays);
 
-  const [ydayRows, weekRows, monthRows, dailyRows] = await Promise.all([
+  const [ydayRows, weekRows, rangeRows, dailyRows] = await Promise.all([
     windsorFetch(GA4, { from: yesterday, to: yesterday, fields: ga4Fields(false) }),
     windsorFetch(GA4, { from: weekStart, to: yesterday, fields: ga4Fields(false) }),
-    windsorFetch(GA4, { from: monthStart, to: yesterday, fields: ga4Fields(false) }),
-    windsorFetch(GA4, { from: monthStart, to: yesterday, fields: [F.date, F.sessions, F.users] }),
+    windsorFetch(GA4, { from: rangeStart, to: yesterday, fields: ga4Fields(false) }),
+    windsorFetch(GA4, { from: rangeStart, to: yesterday, fields: [F.date, F.sessions, F.users] }),
   ]);
 
   const dailyMap = new Map<string, DailyPoint>();
@@ -136,10 +140,11 @@ export async function fetchTrafficData(today = new Date()): Promise<TrafficData>
     yesterdayDate: new Date(yesterday + "T00:00:00Z").toLocaleDateString("en-US", {
       weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC",
     }),
-    rangeLabel: `${MMMD(monthStart)} – ${MMMD(yesterday)}`,
+    rangeLabel: `${MMMD(rangeStart)} – ${MMMD(yesterday)}`,
+    rangeDays,
     yesterday: aggregateChannels(ydayRows),
     week: aggregateChannels(weekRows),
-    channel: aggregateChannels(monthRows),
+    channel: aggregateChannels(rangeRows),
     daily,
   };
 }

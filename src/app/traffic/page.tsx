@@ -1,12 +1,37 @@
+import { unstable_cache } from "next/cache";
 import Nav from "@/components/Nav";
+import RangePicker from "@/components/RangePicker";
 import { ChannelBarChart, DailyTrendChart } from "@/components/TrafficCharts";
 import { store } from "@/lib/store";
 import {
   colorFor, fmtDur, fmtNum, pct, qLabel, qScore, totals, trendPill,
 } from "@/lib/traffic-utils";
-import type { ChannelRow } from "@/lib/types";
+import type { ChannelRow, TrafficData } from "@/lib/types";
+import { fetchTrafficData } from "@/lib/windsor";
 
 export const dynamic = "force-dynamic";
+
+const ALLOWED_RANGES = [7, 14, 30, 90];
+
+/**
+ * Load traffic for the selected range. With a Windsor key we pull live (cached
+ * 30 min per range/day); otherwise we fall back to the stored snapshot/seed.
+ */
+async function loadTraffic(days: number): Promise<TrafficData> {
+  if (process.env.WINDSOR_API_KEY) {
+    try {
+      const dayKey = new Date().toISOString().slice(0, 10);
+      return await unstable_cache(
+        () => fetchTrafficData(new Date(), days),
+        ["traffic", String(days), dayKey],
+        { revalidate: 1800 }
+      )();
+    } catch {
+      /* fall through to snapshot */
+    }
+  }
+  return store.getTraffic();
+}
 
 function YdayDeltaPill({ val, avg, higherIsBetter }: { val: number; avg: number; higherIsBetter: boolean }) {
   const t = trendPill(val, avg, higherIsBetter);
@@ -31,12 +56,19 @@ function buildInsights(channel: ChannelRow[], daily: { date: string; sessions: n
   return out;
 }
 
-export default async function TrafficPage() {
-  const data = await store.getTraffic();
+export default async function TrafficPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
+  const { range } = await searchParams;
+  const days = ALLOWED_RANGES.includes(Number(range)) ? Number(range) : 30;
+  const data = await loadTraffic(days);
+  const rangeDays = data.rangeDays ?? days;
   const yday = totals(data.yesterday);
   const wk = totals(data.week);
   const wkDailyAvg = wk.sessions / 7;
-  const month = totals(data.channel);
+  const period = totals(data.channel);
   const wkMap = new Map(data.week.map((r) => [r.name, r]));
   const insights = buildInsights(data.channel, data.daily);
   const topChannels = data.channel.slice(0, 8);
@@ -51,6 +83,7 @@ export default async function TrafficPage() {
           </h1>
           <p className="hero-subtitle">Website traffic and channel engagement from GA4, refreshed every morning.</p>
           <div className="hero-meta">{data.rangeLabel} · via Windsor.ai</div>
+          <RangePicker active={rangeDays} />
         </div>
       </header>
       <Nav />
@@ -93,13 +126,13 @@ export default async function TrafficPage() {
         <section className="section">
           <div className="section-head">
             <div className="section-label">Overview</div>
-            <h2>30-Day Overview · {data.rangeLabel}</h2>
+            <h2>{rangeDays}-Day Overview · {data.rangeLabel}</h2>
           </div>
           <div className="kpi-row">
-            <div className="kpi-card"><div className="kpi-label">Total Sessions</div><div className="kpi-value">{fmtNum(month.sessions)}</div></div>
-            <div className="kpi-card"><div className="kpi-label">Active Users</div><div className="kpi-value">{fmtNum(month.users)}</div></div>
-            <div className="kpi-card"><div className="kpi-label">Avg Bounce Rate</div><div className="kpi-value">{pct(month.bounce)}</div></div>
-            <div className="kpi-card"><div className="kpi-label">Avg Session Duration</div><div className="kpi-value">{fmtDur(month.duration)}</div></div>
+            <div className="kpi-card"><div className="kpi-label">Total Sessions</div><div className="kpi-value">{fmtNum(period.sessions)}</div></div>
+            <div className="kpi-card"><div className="kpi-label">Active Users</div><div className="kpi-value">{fmtNum(period.users)}</div></div>
+            <div className="kpi-card"><div className="kpi-label">Avg Bounce Rate</div><div className="kpi-value">{pct(period.bounce)}</div></div>
+            <div className="kpi-card"><div className="kpi-label">Avg Session Duration</div><div className="kpi-value">{fmtDur(period.duration)}</div></div>
           </div>
         </section>
 
@@ -120,7 +153,7 @@ export default async function TrafficPage() {
         <section className="section">
           <div className="section-head">
             <div className="section-label">Channels</div>
-            <h2>By Channel · 30 days</h2>
+            <h2>By Channel · {rangeDays} days</h2>
           </div>
           <div className="table-wrap">
             <table className="data-table">
