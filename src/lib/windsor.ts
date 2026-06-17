@@ -58,7 +58,19 @@ async function windsorFetch(connector: string, params: { from: string; to: strin
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Windsor ${connector} → HTTP ${res.status}`);
   const json = (await res.json()) as { data?: Row[] };
-  return json.data ?? [];
+  const data = json.data ?? [];
+
+  // When the Windsor subscription/license lapses, the API returns a placeholder
+  // row ("Uh-oh! License expired...") with zeroed metrics instead of real data.
+  // Treat that as a hard error so we never render or persist zeros over good data.
+  const expired = data.some((r) =>
+    Object.values(r).some(
+      (v) => typeof v === "string" && /license expired|windsor\.ai\/pricing|uh-oh/i.test(v)
+    )
+  );
+  if (expired) throw new Error("WINDSOR_LICENSE_EXPIRED");
+
+  return data;
 }
 
 const num = (v: string | number | null | undefined): number => {

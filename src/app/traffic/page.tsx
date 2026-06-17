@@ -13,16 +13,17 @@ import { fetchDaySnapshot, fetchTrafficData } from "@/lib/windsor";
 type DaySnapshot = { dateLabel: string; day: ChannelRow[]; trailing7: ChannelRow[] };
 
 /** Load one day's at-a-glance snapshot (live, cached 30 min) with a snapshot fallback. */
-async function loadDaySnapshot(day: string): Promise<DaySnapshot> {
+async function loadDaySnapshot(day: string): Promise<{ snap: DaySnapshot; live: boolean }> {
   if (process.env.WINDSOR_API_KEY) {
     try {
-      return await unstable_cache(() => fetchDaySnapshot(day), ["day-snapshot", day], { revalidate: 1800 })();
+      const snap = await unstable_cache(() => fetchDaySnapshot(day), ["day-snapshot", "v2", day], { revalidate: 1800 })();
+      return { snap, live: true };
     } catch {
       /* fall through to snapshot */
     }
   }
-  const snap = await store.getTraffic();
-  return { dateLabel: snap.yesterdayDate, day: snap.yesterday, trailing7: snap.week };
+  const s = await store.getTraffic();
+  return { snap: { dateLabel: s.yesterdayDate, day: s.yesterday, trailing7: s.week }, live: false };
 }
 
 export const dynamic = "force-dynamic";
@@ -33,20 +34,21 @@ const ALLOWED_RANGES = [7, 14, 30, 90];
  * Load traffic for the selected range. With a Windsor key we pull live (cached
  * 30 min per range/day); otherwise we fall back to the stored snapshot/seed.
  */
-async function loadTraffic(days: number): Promise<TrafficData> {
+async function loadTraffic(days: number): Promise<{ data: TrafficData; live: boolean }> {
   if (process.env.WINDSOR_API_KEY) {
     try {
       const dayKey = new Date().toISOString().slice(0, 10);
-      return await unstable_cache(
+      const data = await unstable_cache(
         () => fetchTrafficData(new Date(), days),
-        ["traffic", String(days), dayKey],
+        ["traffic", "v2", String(days), dayKey],
         { revalidate: 1800 }
       )();
+      return { data, live: true };
     } catch {
       /* fall through to snapshot */
     }
   }
-  return store.getTraffic();
+  return { data: await store.getTraffic(), live: false };
 }
 
 function YdayDeltaPill({ val, avg, higherIsBetter }: { val: number; avg: number; higherIsBetter: boolean }) {
@@ -83,8 +85,12 @@ export default async function TrafficPage({
   const day =
     rawDay && /^\d{4}-\d{2}-\d{2}$/.test(rawDay) && rawDay <= yesterdayIso ? rawDay : yesterdayIso;
 
-  const [data, daySnap] = await Promise.all([loadTraffic(days), loadDaySnapshot(day)]);
+  const [{ data, live: liveRange }, { snap: daySnap, live: liveDay }] = await Promise.all([
+    loadTraffic(days),
+    loadDaySnapshot(day),
+  ]);
   const rangeDays = data.rangeDays ?? days;
+  const feedDown = !!process.env.WINDSOR_API_KEY && (!liveRange || !liveDay);
 
   const yday = totals(daySnap.day);
   const wk = totals(daySnap.trailing7);
@@ -110,6 +116,12 @@ export default async function TrafficPage({
       <Nav />
 
       <main className="container">
+        {feedDown && (
+          <div className="notice err" style={{ marginBottom: 20 }}>
+            Live data is temporarily unavailable from the Windsor.ai feed — showing the most recent saved snapshot.
+            Check the Windsor subscription if this persists.
+          </div>
+        )}
         {/* Yesterday */}
         <section className="yesterday-block">
           <div className="yday-header">
