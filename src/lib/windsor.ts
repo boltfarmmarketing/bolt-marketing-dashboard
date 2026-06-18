@@ -47,6 +47,13 @@ function requireKey(): string {
 
 type Row = Record<string, string | number | null>;
 
+const isSentinel = (data: Row[]) =>
+  data.some((r) =>
+    Object.values(r).some(
+      (v) => typeof v === "string" && /license expired|windsor\.ai\/pricing|uh-oh/i.test(v)
+    )
+  );
+
 async function windsorFetch(connector: string, params: { from: string; to: string; fields: string[] }): Promise<Row[]> {
   const url = new URL(`${BASE}/${connector}`);
   url.searchParams.set("api_key", requireKey());
@@ -55,22 +62,19 @@ async function windsorFetch(connector: string, params: { from: string; to: strin
   url.searchParams.set("fields", params.fields.join(","));
   url.searchParams.set("_renderer", "json");
 
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Windsor ${connector} → HTTP ${res.status}`);
-  const json = (await res.json()) as { data?: Row[] };
-  const data = json.data ?? [];
-
-  // When the Windsor subscription/license lapses, the API returns a placeholder
-  // row ("Uh-oh! License expired...") with zeroed metrics instead of real data.
-  // Treat that as a hard error so we never render or persist zeros over good data.
-  const expired = data.some((r) =>
-    Object.values(r).some(
-      (v) => typeof v === "string" && /license expired|windsor\.ai\/pricing|uh-oh/i.test(v)
-    )
-  );
-  if (expired) throw new Error("WINDSOR_LICENSE_EXPIRED");
-
-  return data;
+  // Windsor intermittently returns a placeholder row ("Uh-oh! License expired...")
+  // with zeroed metrics — e.g. while a renewal propagates, or under transient load.
+  // Retry a few times before giving up so one bad response doesn't break the page
+  // or persist zeros over good data.
+  let data: Row[] = [];
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Windsor ${connector} → HTTP ${res.status}`);
+    data = ((await res.json()) as { data?: Row[] }).data ?? [];
+    if (!isSentinel(data)) return data;
+    await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
+  }
+  throw new Error("WINDSOR_LICENSE_EXPIRED");
 }
 
 const num = (v: string | number | null | undefined): number => {
