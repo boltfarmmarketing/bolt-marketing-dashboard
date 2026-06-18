@@ -68,6 +68,9 @@ async function windsorFetch(connector: string, params: { from: string; to: strin
   // or persist zeros over good data.
   let data: Row[] = [];
   for (let attempt = 0; attempt < 4; attempt++) {
+    // Unique param per attempt to bypass Windsor's per-URL response cache, which
+    // can hold a stale "license expired" placeholder from a prior outage window.
+    url.searchParams.set("_cb", `${Date.now()}${Math.round(Math.random() * 1e6)}`);
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`Windsor ${connector} → HTTP ${res.status}`);
     data = ((await res.json()) as { data?: Row[] }).data ?? [];
